@@ -78,9 +78,22 @@ public class solution2 {
         }
     }
 
+    /* The Bus class has a run method that runs in an infinite loop. 
+     * 
+     * The Bus class has four Semaphores: mutex, bus, boarded, and waiting.
+     * 1. The mutex Semaphore is used to protect the waiting variable, which is the number of riders in the boarding area.
+     * 2. The bus Semaphore signals when the bus has arrived.
+     * 3. The boarded Semaphore signals that a rider has boarded.
+     * 4. The waiting variable is an integer that keeps track of how many riders are waiting for the bus.
+     */
     static class Bus implements Runnable {
         @Override
         public void run() {
+            /* The run method of the Bus class gets the mutex Semaphore and holds it throughout the boarding process.
+             * The loop signals each rider in turn and waits for her to board.
+             * 
+             * By controlling the number of signals, the bus prevents more than 50 riders from boarding. When all the riders have boarded, the bus updates waiting, which is an example of the "I'll do it for you" pattern.
+             */
             while (true) {
                 try {
                     mutex.acquire();
@@ -103,6 +116,10 @@ public class solution2 {
         }
     }
 
+    /* Rider class has a run method that runs once for each rider.
+     * 
+     * The Rider class has a Semaphore mutex, which is used to protect the waiting variable.
+     */
     static class Rider implements Runnable {
         private final int id;
 
@@ -110,6 +127,8 @@ public class solution2 {
             this.id = id;
         }
 
+        /*  The run method of the Rider class increments the waiting variable, signals the bus Semaphore, and waits for the boarded Semaphore.
+         */
         @Override
         public void run() {
             try {
@@ -124,6 +143,9 @@ public class solution2 {
             }
         }
 
+        /* 
+         * The board method is called when the rider has boarded the bus.
+         */
         private void board() {
             System.out.println("Rider " + id + " boarded");
         }
