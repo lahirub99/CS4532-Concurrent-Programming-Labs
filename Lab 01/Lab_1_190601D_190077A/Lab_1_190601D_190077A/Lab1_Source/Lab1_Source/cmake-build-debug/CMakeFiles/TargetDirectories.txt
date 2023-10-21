@@ -1,0 +1,3 @@
+/home/wenuka/Lab1_CC/cmake-build-debug/CMakeFiles/Lab1_CC.dir
+/home/wenuka/Lab1_CC/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/wenuka/Lab1_CC/cmake-build-debug/CMakeFiles/rebuild_cache.dir
