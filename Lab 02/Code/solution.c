@@ -79,9 +79,16 @@ Finally, the bus releases the mutex and departs.
 
 int riders = 0;
 sem_t mutex, multiplex, bus, allAboard;
+// 'multiplex' makes sure there are no more than 50 riders in the boarding area. 
+// Riders wait on 'bus', which gets signaled when the bus arrives. 
+// The bus waits on 'allAboard', which gets signaled by the last student to board.
 
+// The bus_thread function runs in an infinite loop and waits for riders to board the bus.
 void *bus_thread(void *arg) {
     while (1) {
+        // When there are riders waiting, it signals the bus semaphore 
+        // and waits for all riders to board the bus by waiting on the allAboard semaphore. 
+        // Once all riders have boarded, the bus departs.
         sem_wait(&mutex);
         if (riders > 0) {
             sem_post(&bus);
@@ -93,9 +100,12 @@ void *bus_thread(void *arg) {
     }
 }
 
+// The rider_thread function is called by each rider thread.
 void *rider_thread(void *arg) {
+    // It waits on the multiplex semaphore to ensure that there are no more than 50 riders in the boarding area. 
     sem_wait(&multiplex);
     sem_wait(&mutex);
+    // It then increments the riders variable and signals the bus semaphore to indicate that it is waiting for the bus.
     riders++;
     sem_post(&mutex);
 
@@ -104,8 +114,11 @@ void *rider_thread(void *arg) {
 
     printf("Rider boarded\n");
 
+    // Once the bus arrives, the rider boards the bus and decrements the riders variable.
     sem_wait(&mutex);
     riders--;
+    // If there are no more riders waiting, the rider signals the allAboard semaphore to indicate that all riders have boarded. 
+    // Otherwise, the rider signals the bus semaphore to indicate that it is waiting for the next bus.
     if (riders == 0) {
         sem_post(&allAboard);
     } else {
@@ -116,6 +129,7 @@ void *rider_thread(void *arg) {
     pthread_exit(NULL);
 }
 
+// The main function initializes the semaphores, creates the bus thread and rider threads, waits for the rider threads to finish, cancels the bus thread, and destroys the semaphores.
 int main() {
     sem_init(&mutex, 0, 1);
     sem_init(&multiplex, 0, 50);
