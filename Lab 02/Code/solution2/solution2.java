@@ -69,13 +69,15 @@ public class solution2 {
     private static int waiting = 0;
 
     public static void main(String[] args) {
-        Thread busThread = new Thread(new Bus());
-        busThread.start();
 
         for (int i = 1; i <= 50; i++) {
             Thread riderThread = new Thread(new Rider(i));
             riderThread.start();
         }
+
+        Thread busThread = new Thread(new Bus());
+        // busThread.start();
+
     }
 
     /* The Bus class has a run method that runs in an infinite loop. 
