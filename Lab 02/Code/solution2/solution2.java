@@ -61,40 +61,40 @@ Bus problem solution (riders):
 package Code.solution2;
 
 import java.util.concurrent.Semaphore;
+import java.util.Random;
 
 public class solution2 {
     private static Semaphore mutex = new Semaphore(1);
     private static Semaphore bus = new Semaphore(0);
     private static Semaphore boarded = new Semaphore(0);
     private static int waiting = 0;
+    private static Random random = new Random();
+    private static int bus_mean = 1200; // mean time between bus arrivals is 20 minutes
+    private static int rider_mean = 30; // mean time between rider arrivals is 30 seconds
 
     public static void main(String[] args) {
-        // Thread riderThread = new Thread(new Rider());
-        // riderThread.start();
+        Thread riderSpawner = new Thread(new riderSpawner());
+        riderSpawner.start();
 
-        Thread riderThreads = new Thread(new riderThreads());
-        riderThreads.start();
-     
-
-        // for (int i = 1; i <= 50; i++) {
-        //     Thread riderThread = new Thread(new Rider(i));
-        //     riderThread.start();
-        // }
-
-        Thread busThreads = new Thread(new busThreads());
-        busThreads.start();
-
+        Thread busSpawner = new Thread(new busSpawner());
+        busSpawner.start();
     }
 
-    static class riderThreads implements Runnable {
+    static long calulateExponentialDelay(int mean) {
+        // Use the mean value to calculate the exponential delay
+        return (long) (-mean * Math.log(1 - random.nextDouble()));
+    }
+
+    static class riderSpawner implements Runnable {
         @Override
         public void run() {
             while (true) {
+
                 Thread riderThread = new Thread(new Rider());
                 riderThread.start();
                 // Thread sleep for spawning for the next rider
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(calulateExponentialDelay(rider_mean));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -103,7 +103,7 @@ public class solution2 {
     }
     
     
-    static class busThreads implements Runnable {
+    static class busSpawner implements Runnable {
         @Override
         public void run() {
             while (true) {
@@ -111,7 +111,7 @@ public class solution2 {
                 busThread.start();
                 // Thread sleep for spawning for the next rider
                 try {
-                    Thread.sleep(7000);
+                    Thread.sleep(calulateExponentialDelay(bus_mean));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -177,7 +177,7 @@ public class solution2 {
             try {
                 mutex.acquire();
                 waiting++;
-                // Thread.sleep(100);
+                waitforthebus();
                 mutex.release();
                 bus.acquire();
                 board();
@@ -185,6 +185,10 @@ public class solution2 {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+
+        private void waitforthebus() {
+            System.out.println("Rider waiting");
         }
 
         /* 
@@ -195,3 +199,4 @@ public class solution2 {
         }
     }
 }
+ 
