@@ -140,6 +140,7 @@ public class solution2 {
             try {
                 mutex.acquire();
                 int n = Math.min(waiting, 50);
+                arrive(n);
                 for (int i = 0; i < n; i++) {
                     bus.release();
                     boarded.acquire();
@@ -154,8 +155,11 @@ public class solution2 {
             // }
         }
 
+        private void arrive(int n) {
+            System.out.println("Bus arrived when " + waiting + " riders waiting and it gets " + n + " riders on board.");
+        }
         private void depart() {
-            System.out.println("Bus departed with " + Math.min(waiting, 50) + " riders");
+            System.out.println("Bus departed with " + waiting + " riders remaining.");
         }
     }
 
@@ -188,7 +192,7 @@ public class solution2 {
         }
 
         private void waitforthebus() {
-            System.out.println("Rider waiting");
+            System.out.println("Rider waiting." + " Total riders waiting: " + waiting );
         }
 
         /* 
