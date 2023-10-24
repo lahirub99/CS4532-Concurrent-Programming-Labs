@@ -69,16 +69,56 @@ public class solution2 {
     private static int waiting = 0;
 
     public static void main(String[] args) {
+        // Thread riderThread = new Thread(new Rider());
+        // riderThread.start();
 
-        for (int i = 1; i <= 50; i++) {
-            Thread riderThread = new Thread(new Rider(i));
-            riderThread.start();
-        }
+        Thread riderThreads = new Thread(new riderThreads());
+        riderThreads.start();
+     
 
-        Thread busThread = new Thread(new Bus());
-        // busThread.start();
+        // for (int i = 1; i <= 50; i++) {
+        //     Thread riderThread = new Thread(new Rider(i));
+        //     riderThread.start();
+        // }
+
+        Thread busThreads = new Thread(new busThreads());
+        busThreads.start();
 
     }
+
+    static class riderThreads implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                Thread riderThread = new Thread(new Rider());
+                riderThread.start();
+                // Thread sleep for spawning for the next rider
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    
+    static class busThreads implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                Thread busThread = new Thread(new Bus());
+                busThread.start();
+                // Thread sleep for spawning for the next rider
+                try {
+                    Thread.sleep(7000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
 
     /* The Bus class has a run method that runs in an infinite loop. 
      * 
@@ -96,21 +136,22 @@ public class solution2 {
              * 
              * By controlling the number of signals, the bus prevents more than 50 riders from boarding. When all the riders have boarded, the bus updates waiting, which is an example of the "I'll do it for you" pattern.
              */
-            while (true) {
-                try {
-                    mutex.acquire();
-                    int n = Math.min(waiting, 50);
-                    for (int i = 0; i < n; i++) {
-                        bus.release();
-                        boarded.acquire();
-                    }
-                    waiting = Math.max(waiting - 50, 0);
-                    mutex.release();
-                    depart();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            //while (true) {
+            try {
+                mutex.acquire();
+                int n = Math.min(waiting, 50);
+                for (int i = 0; i < n; i++) {
+                    bus.release();
+                    boarded.acquire();
                 }
+                waiting = Math.max(waiting - 50, 0);
+                mutex.release();
+                depart();
+                // Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            // }
         }
 
         private void depart() {
@@ -123,11 +164,11 @@ public class solution2 {
      * The Rider class has a Semaphore mutex, which is used to protect the waiting variable.
      */
     static class Rider implements Runnable {
-        private final int id;
+        // private final int id;
 
-        public Rider(int id) {
-            this.id = id;
-        }
+        // public Rider(int id) {
+        //     this.id = id;
+        // }
 
         /*  The run method of the Rider class increments the waiting variable, signals the bus Semaphore, and waits for the boarded Semaphore.
          */
@@ -136,6 +177,7 @@ public class solution2 {
             try {
                 mutex.acquire();
                 waiting++;
+                // Thread.sleep(100);
                 mutex.release();
                 bus.acquire();
                 board();
@@ -149,7 +191,7 @@ public class solution2 {
          * The board method is called when the rider has boarded the bus.
          */
         private void board() {
-            System.out.println("Rider " + id + " boarded");
+            System.out.println("Rider boarded");
         }
     }
 }
