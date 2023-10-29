@@ -48,6 +48,10 @@ for (thread = 0; thread < thread_count; thread++)
         pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
 
 
+// OpenMP example
+#include <omp.h>
+
+# pragma omp parallel num_threads(thread_count) Hello();
 
 
 
