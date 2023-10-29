@@ -44,6 +44,8 @@
 //     return 0;
 // }  /* main */
 
+for (thread = 0; thread < thread_count; thread++)
+        pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
 
 
 
